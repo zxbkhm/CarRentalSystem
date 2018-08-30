@@ -1,0 +1,232 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery-1.12.3.min.js"></script>
+    <script src="/css/bootstrap.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+        }
+        em.r{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: yellowgreen;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        em.w{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: red;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+            margin-top: -50px;
+        }
+    </style>
+</head>
+<body style="background-image: url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535543889270&di=d06bfb1495b8941b952a3d716c591b50&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fwallpaper%2F1212%2F04%2Fc1%2F16339096_1354611995113.jpg);background-size: cover;">
+<nav class="navbar navbar-default">
+    <div class="container-fluid" style="background: rgba(26, 21, 21, 0.075);">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">系统操作</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/reg">用户注册</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/showIndex">回到首页</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h1 style="color: dodgerblue;font-family: KaiTi ;font-weight: bold">注册页面</h1>
+    <div class="col-lg-4">
+        <h1>欢迎注册</h1>
+        <form>
+            <div class="form-group">
+                <label for="yonghuming">用户名</label>
+                <input type="text" class="form-control" name="yonghuming" id="yonghuming" placeholder="用户名不能是数字">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="shenfenzheng">身份证</label>
+                <input type="text" class="form-control" name="shenfenzheng" id="shenfenzheng" placeholder="身份证不能少于18位">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="shenfenzheng">手机号</label>
+                <input type="text" class="form-control" name="shoujihao" id="shoujihao" placeholder="手机号">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="mima">密码</label>
+                <input type="password" class="form-control" name="mima" id="mima" placeholder="密码最少6位">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="querenmima">确认密码</label>
+                <input type="password" class="form-control" id="querenmima" placeholder="请重复输入">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <button type="button" class="btn btn-default" id="zhuce">注册</button>
+        </form>
+    </div>
+</div>
+<script>
+    var yonghumingcheck = false;
+    var mimacheck = false;
+    var shoujihaocheck=false;
+    var querencheck = false;
+    var sfzcheck=false;
+
+    //离开用户名
+    $("#yonghuming").blur(function(){
+        var yonghuming = $(this).val();
+        //正则
+
+        if(/[\!\@\$\<\>\*\.\^]/.test(yonghuming) || /^[0-9]+$/.test(yonghuming) || yonghuming==""){
+            $(this).siblings("em").attr("class","w").html("X");
+            $(this).siblings(".explain").html("请重新输入用户名，不可为空或存在非法字符、数字");
+            yonghumingcheck = false;
+            return;
+        } else{
+            $.get("/repeat/"+yonghuming,function (data) {
+                if (data.result == -2) {
+                    $("#yonghuming").siblings("em").attr("class", "w").html("x");
+                    $("#yonghuming").siblings(".explain").html("用户名重复！");
+                    yonghumingcheck = false;
+                    // return;
+                }else{
+                    $("#yonghuming").siblings("em").attr("class","r").html("√");
+                    $("#yonghuming").siblings(".explain").html("可用！");
+                    yonghumingcheck = true;
+                }
+            })
+        }
+
+    });
+
+    // 身份证
+    $("#shenfenzheng").blur(function(){
+        var shenfenzheng = $(this).val();
+        $.get("/id/"+shenfenzheng,function (data) {
+            if(data.result==-1){
+                $("#shenfenzheng").siblings("em").attr("class","w").html("x");
+                $("#shenfenzheng").siblings(".explain").html("身份证格式不正确！");
+                sfzcheck = false;
+                // return;
+            }
+            else if (data.result == 1) {
+                console.log("yes")
+                $("#shenfenzheng").siblings("em").attr("class","r").html("√");
+                $("#shenfenzheng").siblings(".explain").html("身份证正确！");
+                sfzcheck = true;
+            }
+        })
+    });
+    $("#shoujihao").blur(function () {
+        var shoujihao = $(this).val();
+        var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+        if (!myreg.test(shoujihao)) {
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("手机号格式不正确！");
+            shoujihaocheck = false;
+            return;
+        } else {
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("手机号正确！");
+            shoujihaocheck = true;
+        }
+    });
+
+    //密码的验证
+    $("#mima").blur(function(){
+        var mima = $(this).val();
+        //正则
+        if(mima.length < 6){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("密码长度不够！");
+            mimacheck = false;
+            return;
+        }
+        else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码合法！");
+            mimacheck = true;
+        }
+    });
+
+    //确认密码的验证
+    $("#querenmima").blur(function(){
+        var querenmima = $(this).val();
+        var mima = $("#mima").val();
+        //正则
+        if(querenmima != mima){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("填写不一致！请重试");
+            querencheck = false;
+            return;
+        }else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码一致");
+            querencheck = true;
+            return;
+        }
+    });
+
+    $("input[type=text],input[type=password]").focus(function(){
+        $(this).siblings("em").attr("class","").html("");
+        $(this).siblings(".explain").html("");
+    });
+
+    $("#zhuce").click(function(){
+        var str = $("form").serialize();
+        if(querencheck && mimacheck && shoujihaocheck && sfzcheck && yonghumingcheck){
+            $.post("/doreg",str,function(data){
+                if(data.result == 1){
+                    alert("恭喜，注册成功！");
+                    window.location = "/customer";
+                }
+                else if(data.result == -1){
+                    alert("抱歉，服务器坏了，等等吧！！");
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

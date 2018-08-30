@@ -1,0 +1,150 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery-1.12.3.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+        }
+        em.r{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: yellowgreen;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        em.w{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: red;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+            margin-top: -50px;
+        }
+    </style>
+</head>
+<body style="background-image: url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535275511540&di=e79103061c49347a6fad37cfd44eb052&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F16%2F53%2F18%2F60x58PICfVB_1024.jpg);background-size: cover;background-position: bottom">
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">系统操作</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/car">车辆登记</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/showIndex">回到首页</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h1 style="color: dodgerblue;font-family: KaiTi ;font-weight: bold">添加车辆</h1>
+    <div class="col-lg-4">
+        <h1>欢迎添加新车辆</h1>
+        <form>
+            <div class="form-group">
+                <label for="yonghuming">汽车名称</label>
+                <input type="text" class="form-control" name="carname" id="yonghuming">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="shenfenzheng">汽车类别</label>
+                <select name="class" id="">
+                    <% for (var i = 0; i <arr.length ; i++) {%>
+                    <option value="<%= arr[i] %>"><%= arr[i] %></option>
+                    <%}%>
+                </select>
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="shenfenzheng">每日租金</label>
+                <input type="text" class="form-control" name="money">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+
+            <button type="button" class="btn btn-default" id="zhuce">添加</button>
+        </form>
+    </div>
+</div>
+<script>
+    //汽车名称验证
+    var carname = false;
+    $("#yonghuming").blur(function(){
+        var yonghuming = $(this).val();
+        console.log(yonghuming)
+
+        if(/[\!\@\$\<\>\*\.\^]/.test(yonghuming)|| yonghuming==""){
+            $(this).siblings("em").attr("class","w").html("X");
+            $(this).siblings(".explain").html("请重新输入汽车名称，不可为空或存在非法字符");
+            carname = false;
+            return;
+        }  else{
+            $.get("/findCar/"+yonghuming,function (data) {
+                if (data.result == -2) {
+                    $("#yonghuming").siblings("em").attr("class", "w").html("x");
+                    $("#yonghuming").siblings(".explain").html("已存在车辆！");
+                    carname = false;
+                    // return;
+                }else{
+                    $("#yonghuming").siblings("em").attr("class","r").html("√");
+                    $("#yonghuming").siblings(".explain").html("可用！");
+                    carname = true;
+                }
+            })
+        }
+
+    });
+
+    $("input[type=text],input[type=password]").focus(function(){
+        $(this).siblings("em").attr("class","").html("");
+        $(this).siblings(".explain").html("");
+    });
+
+    $("#zhuce").click(function(){
+        var str = $("form").serialize();
+        console.log(str,carname)
+        if(carname){
+            $.post("/doadd",str,function(data){
+                if(data.result == 1){
+                    alert("恭喜，添加成功！");
+                    window.location = "/car";
+                }
+                else if(data.result == -1){
+                    alert("抱歉，服务器坏了，等等吧！！");
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

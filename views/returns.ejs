@@ -1,0 +1,165 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/jquery-ui.css" />
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <!--PQ Grid files-->
+    <link rel="stylesheet" href="/css/pqgrid.min.css" />
+    <script src="/js/pqgrid.min.js"></script>
+    <!--PQ Grid Office theme-->
+    <link rel="stylesheet" href="/themes/office/pqgrid.css" />
+    <script src="/js/bootstrap.min.js"></script>
+
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+            margin-top: -50px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">系统操作</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/customer">客户查询</a></li>
+                <li><a href="/rent">租赁登记</a></li>
+                <li class="active"><a href="/returns">归还登记</a></li>
+                <li><a href="/statistics">统计分析</a></li>
+                <li><a href="/class">类别档案</a></li>
+                <li><a href="/car">汽车档案</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/del">退出系统</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h1 style="color: dodgerblue;font-family: KaiTi ;font-weight: bold">归还登记</h1>
+
+    <div id="grid" style="margin-top:20px;"></div>
+    <div style="float: right;">
+        <p>
+            <label>共付金额</label>
+            <input type="text" disabled value="" id="yifu">
+        </p>
+        <p>
+            <label>应付金额</label>
+            <input type="text" disabled value="" id="yingfu">
+        </p>
+        <p>
+            <label>违约金额</label>
+            <input type="text" disabled value="" id="yanqi">
+        </p>
+        <p>
+            <label>找零金额</label>
+            <input type="text" disabled value="" id="zhaoling">
+        </p>
+        <input type="button" value="归还" id="shanchubtn" class="btn btn-success"  />
+    </div>
+
+</div>
+<script>
+    bootstrapButton = $.fn.button.noConflict();
+    $.fn.bootstrapBtn = bootstrapButton;
+
+    $.get("/lookrent" ,function (data) {
+
+            // dataobj = data.result;
+            var arr = []
+        for (var i = 0; i < data.result.length; i++) {
+            if(data.result[i].stat == true){
+                arr.push(data.result[i])
+            }
+        }
+        console.log(arr)
+            $("#grid").pqGrid({
+                width: "100%",
+                height: 300,
+                title: "不知道叫啥",
+                resizable: true,
+                draggable: false,
+                dataModel: {
+                    data: arr
+                },
+                pageModel: { type: "local", rPP:10, strRpp: "{0}", strDisplay: "{0} to {1} of {2}" ,rPPOptions:[10,15,20]},
+                colModel: [
+                    {title: "汽车名称", width: 142, dataType: "string", dataIndx: "carname",editable:false,},
+                    {title: "客户名称", width: 142, dataType: "string", dataIndx: "name",editable:false,},
+                    {title: "租赁时间", width: 142, dataType: "string", dataIndx: "nowtime",editable:false,},
+                    {title: "归还时间", width: 142, dataType: "string", dataIndx: "returntime",editable:false,},
+                    {title: "租赁时长(天)", width: 142, dataType: "string", dataIndx: "renttime",editable:false,},
+                    {title: "每日租金", width: 142, dataType: "string", dataIndx: "money",editable:false,},
+                    {title: "应付金额", width: 142, dataType: "string", dataIndx: "allmoney",editable:false,},
+                    {title: "实付金额", width: 142, dataType: "string", dataIndx: "paymoney",editable:false,},
+                ]
+
+            });
+    })
+    var arr = []
+    $(document).on("click", "td", function(){
+        arr = []
+
+        var shuju2=$(this).parents('tr').children();
+        console.log(shuju2)
+        for(var i=0;i<shuju2.length;i++){
+            arr.push(shuju2[i].innerText);
+        }
+
+        var date = new Date(arr[4]);
+        // 有三种方式获取
+        var time1 = date.getTime()/1000;
+        var nowdate = new Date()
+        var time2 = nowdate.getTime()/1000;
+        if(time2-time1>arr[5]*86400){
+            $("#yifu").val(arr[8]);
+            $("#yingfu").val(arr[7]+300);
+            $("#yanqi").val(300)
+            $("#zhaoling").val(arr[8]-arr[7]);
+        }
+        console.log(time1)
+        $("#yifu").val(arr[8]);
+        $("#yingfu").val(arr[7]);
+        $("#yanqi").val(0)
+        $("#zhaoling").prev().html("找零金额")
+        $("#zhaoling").val(arr[8]-arr[7]-0);
+
+    });
+    $("#shanchubtn").click(function () {
+        $.post("/doreturn",{
+            "carname":arr[1],
+            "yingfu":$("#yingfu").val()
+        },function (data) {
+            if(data.results==-1){
+                alert("归还失败")
+            }
+            else{
+                window.location="/returns"
+                alert("归还成功")
+            }
+        })
+    })
+</script>
+</body>
+</html>

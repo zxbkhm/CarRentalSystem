@@ -28,12 +28,49 @@ app.use(express.static("public"))
 //显示首页（登录）
 app.get("/",function (req, res) {
     var login = req.session.login == true ? true : false;
+    var admin = req.session.admin == true ? true : false;
     if (login) {
         res.redirect("/showIndex")
     }else {
-        res.render("login")
+        res.render("login",{
+            admin:admin
+        })
     }
 
+})
+//注册管理员
+app.get("/adminReg",function (req, res) {
+    res.render("adminReg")
+    req.session.admin = true;
+})
+//验证重复
+app.get("/adminReg/:name",function (req, res) {
+    var yonghuming = req.params.name;
+    admin.getAmdinName(yonghuming,function (err, data) {
+        if(data){
+            res.json({"result":-2})
+        }else{
+            res.json({"result":1})
+            res.redirect("/")
+        }
+    })
+})
+//确定注册
+app.post("/doadminReg",function (req, res) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields) {
+        var  yonghuming=fields.yonghuming;
+        var  mima=fields.mima;
+        admin.addAdmin(yonghuming,mima,function (err) {
+            if(err){
+                res.json({"result":-1});
+
+            }else{
+                res.json({"result":1});
+            }
+
+        })
+    });
 })
 //显示登录页，并判断登录
 app.post("/login",function (req, res) {
@@ -63,6 +100,8 @@ app.post("/login",function (req, res) {
 app.get("/showIndex",function (req, res) {
     res.render("index")
 })
+
+
 
 //关于客户档案的接口
 app.get("/customer",function (req, res) {
@@ -339,6 +378,8 @@ app.get("/getClassCar/:name",function (req, res) {
     })
 })
 
+
+
 //显示租赁页
 app.get("/rent",function (req, res) {
     car.getAllCar(function (err, data) {
@@ -530,4 +571,4 @@ app.get("/del",function (req, res) {
 })
 
 
-app.listen(3001,"172.16.49.130")
+app.listen(3001)

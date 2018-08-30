@@ -1,10 +1,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>管理员注册</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <script src="/js/jquery-1.12.3.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="/css/bootstrap.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
     <style>
         *{
@@ -38,9 +38,9 @@
         }
     </style>
 </head>
-<body style="background-image: url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535275511540&di=e79103061c49347a6fad37cfd44eb052&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F16%2F53%2F18%2F60x58PICfVB_1024.jpg);background-size: cover;background-position: bottom">
+<body style="background-image: url(https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535543889270&di=d06bfb1495b8941b952a3d716c591b50&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fwallpaper%2F1212%2F04%2Fc1%2F16339096_1354611995113.jpg);background-size: cover;">
 <nav class="navbar navbar-default">
-    <div class="container-fluid">
+    <div class="container-fluid" style="background: rgba(26, 21, 21, 0.075);">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -53,82 +53,110 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/car">车辆登记</a></li>
+                <li><a href="/reg">管理员注册</a></li>
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/showIndex">回到首页</a></li>
+                <li><a href="/">回到首页</a></li>
             </ul>
         </div>
     </div>
 </nav>
 <div class="container">
-    <h1 style="color: dodgerblue;font-family: KaiTi ;font-weight: bold">添加车辆</h1>
+    <h1 style="color: dodgerblue;font-family: KaiTi ;font-weight: bold">管理员注册页面</h1>
     <div class="col-lg-4">
-        <h1>欢迎添加新车辆</h1>
+        <h1>欢迎注册</h1>
         <form>
             <div class="form-group">
-                <label for="yonghuming">汽车名称</label>
-                <input type="text" class="form-control" name="carname" id="yonghuming">
+                <label for="yonghuming">用户名</label>
+                <input type="text" class="form-control" name="yonghuming" id="yonghuming" placeholder="用户名不能是数字">
                 <em class=""></em>
                 <span class="explain"></span>
             </div>
+
 
             <div class="form-group">
-                <% if(arr.length>10){  %>
-                <label for="shenfenzheng">汽车类别</label>
-                <select name="class" id="">
-                    <% for (var i = 0; i <arr.length ; i++) {%>
-                    <option value="<%= arr[i] %>"><%= arr[i] %></option>
-                    <%}%>
-                </select>
-                <%}else{%>
-                <label for="yonghuming">汽车类别</label>
-                <input type="text" class="form-control" name="class" id="yonghuming">
-
-                <% } %>
+                <label for="mima">密码</label>
+                <input type="password" class="form-control" name="mima" id="mima" placeholder="密码最少6位">
                 <em class=""></em>
                 <span class="explain"></span>
             </div>
-
             <div class="form-group">
-                <label for="shenfenzheng">每日租金</label>
-                <input type="text" class="form-control" name="money">
+                <label for="querenmima">确认密码</label>
+                <input type="password" class="form-control" id="querenmima" placeholder="请重复输入">
                 <em class=""></em>
                 <span class="explain"></span>
             </div>
 
-            <button type="button" class="btn btn-default" id="zhuce">添加</button>
+            <button type="button" class="btn btn-default" id="zhuce">注册</button>
         </form>
     </div>
 </div>
 <script>
-    //汽车名称验证
-    var carname = false;
+    var yonghumingcheck = false;
+    var mimacheck = false;
+    var querencheck = false;
+
+    //离开用户名
     $("#yonghuming").blur(function(){
         var yonghuming = $(this).val();
-        console.log(yonghuming)
+        //正则
 
-        if(/[\!\@\$\<\>\*\.\^]/.test(yonghuming)|| yonghuming==""){
+        if(/[\!\@\$\<\>\*\.\^]/.test(yonghuming) || /^[0-9]+$/.test(yonghuming) || yonghuming==""){
             $(this).siblings("em").attr("class","w").html("X");
-            $(this).siblings(".explain").html("请重新输入汽车名称，不可为空或存在非法字符");
-            carname = false;
+            $(this).siblings(".explain").html("请重新输入用户名，不可为空或存在非法字符、数字");
+            yonghumingcheck = false;
             return;
-        }  else{
-            $.get("/findCar/"+yonghuming,function (data) {
+        } else{
+            $.get("/adminReg/"+yonghuming,function (data) {
                 if (data.result == -2) {
                     $("#yonghuming").siblings("em").attr("class", "w").html("x");
-                    $("#yonghuming").siblings(".explain").html("已存在车辆！");
-                    carname = false;
+                    $("#yonghuming").siblings(".explain").html("用户名重复！");
+                    yonghumingcheck = false;
                     // return;
                 }else{
                     $("#yonghuming").siblings("em").attr("class","r").html("√");
                     $("#yonghuming").siblings(".explain").html("可用！");
-                    carname = true;
+                    yonghumingcheck = true;
                 }
             })
         }
 
+    });
+
+    //密码的验证
+    $("#mima").blur(function(){
+        var mima = $(this).val();
+        //正则
+        if(mima.length < 6){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("密码长度不够！");
+            mimacheck = false;
+            return;
+        }
+        else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码合法！");
+            mimacheck = true;
+        }
+    });
+
+    //确认密码的验证
+    $("#querenmima").blur(function(){
+        var querenmima = $(this).val();
+        var mima = $("#mima").val();
+        //正则
+        if(querenmima != mima){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("填写不一致！请重试");
+            querencheck = false;
+            return;
+        }else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码一致");
+            querencheck = true;
+            return;
+        }
     });
 
     $("input[type=text],input[type=password]").focus(function(){
@@ -138,12 +166,11 @@
 
     $("#zhuce").click(function(){
         var str = $("form").serialize();
-        console.log(str,carname)
-        if(carname){
-            $.post("/doadd",str,function(data){
+        if(querencheck && mimacheck && yonghumingcheck){
+            $.post("/doadminReg",str,function(data){
                 if(data.result == 1){
-                    alert("恭喜，添加成功！");
-                    window.location = "/car";
+                    alert("恭喜，注册成功！");
+                    window.location = "/";
                 }
                 else if(data.result == -1){
                     alert("抱歉，服务器坏了，等等吧！！");

@@ -26,7 +26,6 @@ exports.addCount = function (leibie,many,money,callback) {
 
 //查找是否租赁过此类别汽车
 exports.findOneClass = function (leibie,callback) {
-
     count.find({"data.class":leibie},function (err,data) {
             callback(data)
     })

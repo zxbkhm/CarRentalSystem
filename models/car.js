@@ -24,6 +24,11 @@ exports.addNewCar = function (fields, callback) {
         callback(err,data)
     })
 }
+
+//按表格添加数据
+exports.addxlsx = function(arr,callback){
+
+}
 //查找是否车辆已经存在
 exports.findOne = function (v,callback) {
     Car.find({"carname": v },function (err, data) {

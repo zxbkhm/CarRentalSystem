@@ -563,6 +563,30 @@ app.get("/tu",function (req, res) {
 
 
 })
+//获取所有类别
+app.get("/all",function (req, res) {
+    var arr = []
+    car.getAllCar(function (err, data) {
+        if(err){
+            res.send("出错了")
+        }else{
+            for(var i = 0; i < data.length; i++){
+                for(var j = i + 1; j < data.length; j++){
+                    if(data[i].class === data[j].class){
+                        j = ++i;
+                    }
+                }
+                arr.push(data[i].class);
+            }
+        }
+        res.json({
+            "arr":arr
+        })
+
+    })
+})
+
+
 
 //退出登录
 app.get("/del",function (req, res) {

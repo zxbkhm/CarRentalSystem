@@ -99,88 +99,101 @@
         </p>
     </div>
 
-<script>
-    bootstrapButton = $.fn.button.noConflict();
-    $.fn.bootstrapBtn = bootstrapButton;
+    <script>
+        bootstrapButton = $.fn.button.noConflict();
+        $.fn.bootstrapBtn = bootstrapButton;
 
 
-    $("#lx").change(function () {
-        var name = $(this).val()
-        console.log($(this).html())
-        localStorage.setItem("name",name)
-        history.go(0)
-    })
-    if(localStorage.getItem("name")==null){
-        get("起亚")
-        $("#class").html("起亚类型的汽车有:")
-    }else{
-        get(localStorage.getItem("name"))
-        $("#lx").val(localStorage.getItem("name"))
-        $("#class").html(localStorage.getItem("name")+"类型的汽车有:")
+        $("#lx").change(function () {
+            var name = $(this).val()
+            console.log($(this).html())
+            localStorage.setItem("name",name)
+            history.go(0)
+        })
+        if(localStorage.getItem("name")==null){
+            get("起亚")
+            $("#class").html("起亚类型的汽车有:")
+        }else{
+            get(localStorage.getItem("name"))
+            $("#lx").val(localStorage.getItem("name"))
+            $("#class").html(localStorage.getItem("name")+"类型的汽车有:")
 
-    }
-    function get(name) {
-        $.get("/getClassCar/"+name ,function (data) {
-            if (data.result == -1) {
-                alert("抱歉出错了")
-            }else{
-                dataobj = data.result;
-                $("#grid").pqGrid({
-                    width: "100%",
-                    height: 300,
-                    title: "不知道叫啥",
-                    resizable: true,
-                    draggable: false,
-                    dataModel: {
-                        data: dataobj
-                    },
-                    // selectionModel: { type: 'none', subtype:'incr', cbHeader:true, cbAll:true},
-                    pageModel: { type: "local", rPP:10, strRpp: "{0}", strDisplay: "{0} to {1} of {2}" ,rPPOptions:[10,15,20]},
-                    colModel: [
-                        {title: "汽车名称", width: 150, dataType: "string", dataIndx: "carname",editable:false,},
-                        {title: "每日租金", width: 250, dataType: "string", dataIndx: "money",editable:false,},
-                        {title: "出租状态", width: 250, dataType: "string", dataIndx: "chuzu",editable:false,},
+        }
+        function get(name) {
+            $.get("/getClassCar/"+name ,function (data) {
+                if (data.result == -1) {
+                    alert("抱歉出错了")
+                }else{
+                    dataobj = data.result;
+                    $("#grid").pqGrid({
+                        width: "100%",
+                        height: 300,
+                        title: "不知道叫啥",
+                        resizable: true,
+                        draggable: false,
+                        dataModel: {
+                            data: dataobj
+                        },
+                        // selectionModel: { type: 'none', subtype:'incr', cbHeader:true, cbAll:true},
+                        pageModel: { type: "local", rPP:10, strRpp: "{0}", strDisplay: "{0} to {1} of {2}" ,rPPOptions:[10,15,20]},
+                        colModel: [
+                            {title: "汽车名称", width: 150, dataType: "string", dataIndx: "carname",editable:false,},
+                            {title: "每日租金", width: 250, dataType: "string", dataIndx: "money",editable:false,},
+                            {title: "出租状态", width: 250, dataType: "string", dataIndx: "chuzu",editable:false,},
 
-                    ],
-                   
+                        ],
 
-                });
+
+                    });
+                }
+
+            })
+        }
+
+        $.get("/alluser",function (data) {
+            for(var i=0;i<data.results.length;i++){
+                var op=$("<option value='"+data.results[i].name+"'>"+data.results[i].name+"</option>")
+                op.appendTo($('#opa'))
             }
 
         })
-    }
+        $(document).on("click", "td", function(){
+            var day = null
+            arr=[];
+            var shuju2=$(this).parents('tr').children();
+            console.log(shuju2)
+            for(var i=0;i<shuju2.length;i++){
+                arr.push(shuju2[i].innerText);
+            }
+            $('input[name=carname]').val(arr[1])
+            $('input[name=money]').val(arr[2]);
+            $.post("/suan",{
+                "renttime":$('input[name=renttime]').val(),
+                "carname": $('input[name=carname]').val()
+            },function (data) {
+                $('input[name=allmoney]').val(data.result)
+                $('input[name=paymoney]').val(data.result+100)
+            })
+        });
+        $('input[name=renttime]').change(function () {
+            var che = $('input[name=carname]').val()
 
-    $.get("/alluser",function (data) {
-        for(var i=0;i<data.results.length;i++){
-            var op=$("<option value='"+data.results[i].name+"'>"+data.results[i].name+"</option>")
-            op.appendTo($('#opa'))
-        }
-
-     })
-    $(document).on("click", "td", function(){
-        var day = null
-        arr=[];
-        var shuju2=$(this).parents('tr').children();
-        console.log(shuju2)
-        for(var i=0;i<shuju2.length;i++){
-            arr.push(shuju2[i].innerText);
-        }
-        $('input[name=carname]').val(arr[1])
-        $('input[name=money]').val(arr[2]);
-        $.post("/suan",{
-            "renttime":$('input[name=renttime]').val(),
-            "carname": $('input[name=carname]').val()
-        },function (data) {
-            $('input[name=allmoney]').val(data.result)
-            $('input[name=paymoney]').val(data.result+100)
+            if($('input[name=money]').val()!=''){
+                $.post("/suan",{
+                    "renttime":$(this).val(),
+                    "carname":che
+                },function (data) {
+                    $('input[name=allmoney]').val(data.result)
+                    $('input[name=paymoney]').val(data.result+100)
+                })
+            }
         })
-    });
-    $('#addrent').click(function () {
-        if($('input[name=carname]').val()==""||$('input[name=allmoney]').val()==""){
-            alert("请选择租赁车辆")
-            return;
-        }
-        $.get("/countuser/"+$('#opa').val(),function (data) {
+        $('#addrent').click(function () {
+            if($('input[name=carname]').val()==""||$('input[name=allmoney]').val()==""){
+                alert("请选择租赁车辆")
+                return;
+            }
+            $.get("/countuser/"+$('#opa').val(),function (data) {
                 if(data.result>5){
                     alert("此用户租赁车辆已达上限")
                     return;
@@ -202,14 +215,11 @@
                         }
                     })
                 }
+            })
         })
 
 
 
-    })
-
-
-
-</script>
+    </script>
 </body>
 </html>

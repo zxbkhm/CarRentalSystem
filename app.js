@@ -105,7 +105,12 @@ app.get("/showIndex",function (req, res) {
 
 //关于客户档案的接口
 app.get("/customer",function (req, res) {
-    res.render("customer")
+    if(req.session.login == true){
+        res.render("customer")
+    }else{
+        res.send("请先登录<a href=/>返回首页</a>")
+    }
+
 })
 //获取所有客户渲染
 app.get("/alluser",function (req, res) {
@@ -217,7 +222,11 @@ app.get("/userDel/:name",function (req, res) {
 //关于所有汽车的接口
 //显示汽车档案
 app.get("/car",function (req, res) {
-    res.render("car")
+    if(req.session.login == true){
+        res.render("car")
+    }else{
+        res.send("请先登录<a href=/>返回首页</a>")
+    }
 })
 //获取所有汽车
 app.get("/allcar",function (req, res) {
@@ -341,9 +350,15 @@ app.get("/class",function (req, res) {
                 arr.push(data[i].class);
             }
         }
+
+        if(req.session.login == true){
             res.render("class",{
                 arr:arr
             })
+        }else{
+            res.send("请先登录<a href=/>返回首页</a>")
+        }
+
 
     })
 
@@ -396,9 +411,14 @@ app.get("/rent",function (req, res) {
                 arr.push(data[i].class);
             }
         }
-        res.render("rent",{
-            arr:arr
-        })
+        if(req.session.login == true){
+            res.render("rent",{
+                arr:arr
+            })
+        }else{
+            res.send("请先登录<a href=/>返回首页</a>")
+        }
+
 
     })
 })
@@ -475,7 +495,11 @@ app.post('/rentOut',function (req,res) {
 
 //归还登记页面
 app.get("/returns",function (req, res) {
-    res.render("returns")
+    if(req.session.login == true){
+        res.render("returns")
+    }else{
+        res.send("请先登录<a href=/>返回首页</a>")
+    }
 })
 //查看所有租赁信息
 app.get("/lookrent",function (req, res) {
@@ -551,7 +575,12 @@ app.post("/doreturn",function (req, res) {
 
 //统计
 app.get("/statistics",function (req, res) {
-    res.render("statistics")
+    if(req.session.login == true){
+        res.render("statistics")
+    }else{
+        res.send("请先登录<a href=/>返回首页</a>")
+    }
+
 })
 //渲染图
 app.get("/tu",function (req, res) {

@@ -98,7 +98,12 @@ app.post("/login",function (req, res) {
 })
 //登陆后显示首页
 app.get("/showIndex",function (req, res) {
-    res.render("index")
+    if(req.session.login == true){
+        res.render("index")
+    }else{
+        res.send("请先登录<a href=/>返回首页</a>")
+    }
+
 })
 
 
@@ -624,4 +629,4 @@ app.get("/del",function (req, res) {
 })
 
 
-app.listen(3001)
+app.listen(3000)

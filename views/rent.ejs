@@ -188,7 +188,24 @@
                 })
             }
         })
+        function timestampToTime(timestamp) {
+            var date = new Date(timestamp );//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+            var D = date.getDate() + ' ';
+            var h = date.getHours() + ':';
+            var m = date.getMinutes() + ':';
+            var s = date.getSeconds();
+            return Y+M+D+h+m+s;
+        }
+        var time=null;
+        var times=null;
+        var returntime=null
         $('#addrent').click(function () {
+            time = new Date()
+            times = time.getTime()
+            returntime = times+86400000*$('input[name=renttime]').val()
+            console.log(timestampToTime(returntime))
             if($('input[name=carname]').val()==""||$('input[name=allmoney]').val()==""){
                 alert("请选择租赁车辆")
                 return;
@@ -202,6 +219,8 @@
                         "renttime":$('input[name=renttime]').val(),
                         'name':$('#opa').val(),
                         'carname':$('input[name=carname]').val(),
+                        "nowTime":timestampToTime(times),
+                        "returnTime":timestampToTime(returntime),
                         'money':$('input[name=money]').val(),
                         'allmoney':$('input[name=allmoney]').val(),
                         'paymoney':$('input[name=paymoney]').val(),

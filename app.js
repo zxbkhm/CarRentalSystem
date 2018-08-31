@@ -472,7 +472,6 @@ app.post("/suan",function (req, res) {
 app.post('/rentOut',function (req,res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-
         rent.add(fields,true,function (err, data) {
             if (err) {
                 res.json({"result":-1})
